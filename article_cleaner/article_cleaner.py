@@ -1,7 +1,7 @@
 import argparse
 import json
 import os
-def write_articles_to_dir(in_file, out_dir):
+def write_articles_to_dir(in_file, out_dir, filter_tags=None):
     if in_file.name.endswith('.json'):
         site_dir = os.path.join(out_dir, os.path.basename(in_file.name)[:-5])
     else:
@@ -11,8 +11,11 @@ def write_articles_to_dir(in_file, out_dir):
     js = json.load(in_file)
     for i, js_dict in enumerate(js):
         with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
-            f.write(js_dict['Content'][0].encode("utf-8"))
-    
+            if filter_tags and filter_tags(js_dict['Category']):
+                f.write(js_dict['Content'][0].encode("utf-8"))
+
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes files and outputs \
     each site\'s articles as its own file in the site\'s directory')
