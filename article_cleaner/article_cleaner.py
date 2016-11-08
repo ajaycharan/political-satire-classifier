@@ -4,6 +4,8 @@ import os
 import re
 
 def write_articles_to_dir(in_file, out_dir, filter_tags=None):
+    if not filter_tags:
+        print 'No filter'
     if in_file.name.endswith('.json'):
         site_dir = os.path.join(out_dir, os.path.basename(in_file.name)[:-5])
     else:
@@ -12,23 +14,23 @@ def write_articles_to_dir(in_file, out_dir, filter_tags=None):
         os.mkdir(site_dir)
     js = json.load(in_file)
     for i, js_dict in enumerate(js):
-        with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
-            if 'Category' in js_dict:
-                cat_tags = js_dict['Category']
-            elif 'Tags' in js_dict:
-                cat_tags = js_dict['Tags']
-            else:
-                cat_tags = []
-            if filter_tags and filter_tags(cat_tags):
+        if 'Category' in js_dict:
+            cat_tags = js_dict['Category']
+        elif 'Tags' in js_dict:
+            cat_tags = js_dict['Tags']
+        else:
+            cat_tags = []
+        if filter_tags and filter_tags(cat_tags):
+            with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
                 f.write(js_dict['Content'][0].encode("utf-8"))
 
  
 seperator = re.compile(u'[ /,]*')        
-political_set = {'Politics'}
+political_set = {'politics', 'election', 'politicsnews'}
 #Tags may be a list of tags or one item in a list which must be regexed into a tag list            
 def filter_tags(tag_list):
     for t in tag_list:
-        words = re.split(seperator, t)
+        words = re.split(seperator, t.lower())
         for w in words:
             if w in political_set:
                 return True
@@ -41,9 +43,8 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output_dir', metavar='DEST', default='.', 
                         help='Directory where directories of sites with \
                         articles will be stored. Default is current directory.')
-    parser.add_argument('-f', '--filter_tags', action='store_const', const=filter_tags default=None)
+    parser.add_argument('-f', '--filter_tags', action='store_const', const=filter_tags, default=None)
     args = parser.parse_args()
-    print args.filter_tags
     
     if not os.path.isdir(args.output_dir):
         if  os.path.exists(args.output_dir):
@@ -52,4 +53,3 @@ if __name__ == '__main__':
             os.mkdir(args.output_dir)
     for f in args.files:
         write_articles_to_dir(f, args.output_dir, args.filter_tags)
-    print args.files
