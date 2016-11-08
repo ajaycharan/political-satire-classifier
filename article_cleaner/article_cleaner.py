@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output_dir', metavar='DEST', default='.', 
                         help='Directory where directories of sites with \
                         articles will be stored. Default is current directory.')
-    parser.add_argument('-f', '--filter_tags', action='store_const', const=filter_tags)
+    parser.add_argument('-f', '--filter_tags', action='store_const', const=filter_tags default=None)
     args = parser.parse_args()
     print args.filter_tags
     
