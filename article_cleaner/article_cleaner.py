@@ -26,7 +26,8 @@ def write_articles_to_dir(in_file, out_dir, filter_tags=None):
 
  
 seperator = re.compile(u'[ /,]*')        
-political_set = {'politics', 'election', 'politicsnews'}
+political_set = {'politics', 'election', 'politicsnews', 'world', 'worldnews', 
+                 'domesticnews', 'u.s.', 'us'}
 #Tags may be a list of tags or one item in a list which must be regexed into a tag list            
 def filter_tags(tag_list):
     for t in tag_list:
