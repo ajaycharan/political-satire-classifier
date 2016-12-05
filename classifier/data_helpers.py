@@ -37,26 +37,19 @@ def load_data_and_labels(positive_data_file_loc, negative_data_file_loc):
     # Split by words
     category_names = ["positive", "negative"]
     categories_locs = [positive_data_file_loc, negative_data_file_loc]
-    folders = ["train", 'test']
     data = {}
     for category_name, category_loc in zip(category_names, categories_locs):
-        data[category_name] = {}
-        for folder in folders:
-            data[category_name][folder] = []
-            for filename in os.listdir(os.path.join(category_loc, folder)):
-                with codecs.open(os.path.join(category_loc, folder, filename), 'r', 'utf-8') as f:
-                    data[category_name][folder].append(f.read())
+        data[category_name] = []
+        for filename in os.listdir(category_loc):
+            with codecs.open(os.path.join(category_loc, filename), 'r', 'utf-8') as f:
+                data[category_name].append(f.read())
     #x_text = [clean_str(sent) for sent in x_text]
     # Generate labels
-    positive_labels_train = [[0, 1] for _ in data['positive']['train']]
-    positive_labels_test = [[0, 1] for _ in data['positive']['test']]
-    negative_labels_train = [[1, 0] for _ in data['negative']['train']]
-    negative_labels_test = [[1, 0] for _ in data['negative']['test']]
-    x_train = np.concatenate([data['positive']['train'], data['negative']['train']], 0)
-    x_test = np.concatenate([data['positive']['test'], data['negative']['test']], 0)
-    y_train = np.concatenate([positive_labels_train, negative_labels_train], 0)
-    y_test = np.concatenate([positive_labels_test, negative_labels_test], 0)
-    return [x_train, y_train, x_test, y_test]
+    positive_labels = [[0, 1] for _ in data['positive']]
+    negative_labels = [[1, 0] for _ in data['negative']]
+    x = np.concatenate([data['positive'], data['negative']], 0)
+    y = np.concatenate([positive_labels, negative_labels], 0)
+    return [x, y]
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):

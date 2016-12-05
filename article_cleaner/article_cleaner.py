@@ -49,9 +49,9 @@ def write_train_test_dir(in_files, classes, out_dir, percent_train=10, filter_ta
         random.shuffle(test_list)
         for i, js_dict, is_test_file in zip(range(i, len(js)), js, test_list):
             if (is_test_file):
-                site_dir = os.path.join(out_dir, art_class, "test")
+                site_dir = os.path.join(out_dir,  "test", art_class)
             else:
-                site_dir = os.path.join(out_dir, art_class, "train")
+                site_dir = os.path.join(out_dir, "train", art_class)
             if not os.path.exists(site_dir):
                 os.makedirs(site_dir)
             if 'Category' in js_dict:

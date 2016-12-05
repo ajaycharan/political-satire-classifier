@@ -46,7 +46,7 @@ print("")
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_files, FLAGS.negative_data_files)[0:2]
+x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_files, FLAGS.negative_data_files)
 
 # Build vocabulary
 max_document_length = max([len(nltk.word_tokenize(x)) for x in x_text])
