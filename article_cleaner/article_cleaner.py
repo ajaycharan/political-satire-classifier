@@ -4,6 +4,7 @@ import json
 import os
 import re
 import random
+from tld import get_tld
 
 def write_articles_to_dir(in_file, out_dir, filter_tags=None):
     if not filter_tags:
@@ -30,7 +31,9 @@ def write_articles_to_dir(in_file, out_dir, filter_tags=None):
             cat_tags = js_dict['Tags']
         else:
             cat_tags = []
-        if filter_tags and filter_tags(cat_tags):
+        url = js_dict['url']
+        content = js_dict['Content']
+        if filter_tags and filter_tags(cat_tags, url, content):
             with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
                 f.write(js_dict['Content'][0].encode("utf-8"))
 
@@ -44,7 +47,7 @@ def write_train_test_dir(in_files, classes, out_dir, percent_train=10, filter_ta
     for in_file, art_class in zip(in_files, classes):
         js = json.load(in_file)
         i = 0
-        test_list = ([True for _ in range(percent_train *len(js) // 100)] + 
+        test_list = ([True for _ in range(percent_train *len(js) // 100)] +
             [False for _ in range(len(js) - (percent_train *len(js) // 100))])
         random.shuffle(test_list)
         for i, js_dict, is_test_file in zip(range(i, len(js)), js, test_list):
@@ -60,7 +63,9 @@ def write_train_test_dir(in_files, classes, out_dir, percent_train=10, filter_ta
                 cat_tags = js_dict['Tags']
             else:
                 cat_tags = []
-            if filter_tags and filter_tags(cat_tags):
+            url = js_dict['url']
+            content = js_dict['Content']
+            if filter_tags and filter_tags(cat_tags, url, content):
                 with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
                     f.write(js_dict['Content'][0].encode("utf-8"))
         i += len(js)
@@ -69,13 +74,33 @@ seperator = re.compile(u'([ /,-]|.html)*')
 political_set = {'politics', 'election', 'politicsnews', 'world', 'worldnews',
                  'domesticnews', 'u.s.', 'us', 'news', 'world', 'national', 'nation'}
 #Tags may be a list of tags or one item in a list which must be regexed into a tag list
-def filter_tags(tag_list):
+def filter_tags(tag_list, url, content):
     for t in tag_list:
         words = re.split(seperator, t.lower())
         for w in words:
             if w in political_set:
+                filter_source_cheating(content)
                 return True
     return False
+
+name_getter = re.compile(r"^(.*?)\..*")
+def filter_out_source(url, content):
+    source_name = re.search(name_getter, get_tld(url))
+    for w in content:
+        if w == source_name:
+            content.replace(w, "our reports")
+
+source_set = {'HuffPost', 'Huffington Post', 'New York Times', 'The Times',
+              'CNN', 'NBC', 'LA Times', 'Boston Globe', 'The Globe', 'Cracked',
+              'Lush for Life', 'The Onion', 'Beaverton', 'The Civilian'}
+def filter_source_cheating(content):
+    for article in content:
+        words = re.split(seperator, article)
+        for i, w in enumerate(words):
+            if w in source_set:
+                print words[i]
+                words[i] = "our reports"
+                print words[i]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes files and outputs \
@@ -105,5 +130,5 @@ if __name__ == '__main__':
         'lushforlife.json': 'satire',
     }
     print 'Writing files...'
-    write_train_test_dir(args.files, [class_dict[os.path.basename(f.name)] for f in args.files], 
+    write_train_test_dir(args.files, [class_dict[os.path.basename(f.name)] for f in args.files],
         args.output_dir, filter_tags=args.filter_tags)
