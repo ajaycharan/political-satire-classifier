@@ -41,7 +41,7 @@ def load_data_and_labels(positive_data_file_loc, negative_data_file_loc):
     for category_name, category_loc in zip(category_names, categories_locs):
         data[category_name] = []
         for filename in os.listdir(category_loc):
-            with codecs.open(os.path.join(category_loc, filename), 'r', 'utf-8') as f:
+            with codecs.open(os.path.join(category_loc, filename), 'r', 'utf-8', errors='ignore') as f:
                 data[category_name].append(f.read())
     #x_text = [clean_str(sent) for sent in x_text]
     # Generate labels
