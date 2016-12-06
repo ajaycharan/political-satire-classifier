@@ -14,8 +14,8 @@ import nltk
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("positive_data_files", "articles/news", "Data source for the positive data.")
-tf.flags.DEFINE_string("negative_data_files", "articles/satire", "Data source for the positive data.")
+tf.flags.DEFINE_string("positive_data_files", "articles/train/news", "Data source for the positive data.")
+tf.flags.DEFINE_string("negative_data_files", "articles/train/satire", "Data source for the positive data.")
 
 # Model Hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")

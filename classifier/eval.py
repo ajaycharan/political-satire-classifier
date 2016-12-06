@@ -15,8 +15,8 @@ import nltk
 # ==================================================
 
 # Data Parameters
-tf.flags.DEFINE_string("positive_data_file", "./articles/news", "Data source for the positive data.")
-tf.flags.DEFINE_string("negative_data_file", "./articles/satire", "Data source for the positive data.")
+tf.flags.DEFINE_string("positive_data_file", "./articles/test/news", "Data source for the positive data.")
+tf.flags.DEFINE_string("negative_data_file", "./articles/test/satire", "Data source for the positive data.")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 20, "Batch Size (default: 20)")
