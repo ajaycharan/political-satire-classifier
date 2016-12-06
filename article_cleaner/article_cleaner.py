@@ -4,8 +4,6 @@ import json
 import os
 import re
 import random
-#use "pip install tld"
-from tld import get_tld
 
 def write_articles_to_dir(in_file, out_dir, filter_tags=None):
     if not filter_tags:
@@ -65,51 +63,31 @@ def write_train_test_dir(in_files, classes, out_dir, percent_train=10, filter_ta
             else:
                 cat_tags = []
             url = js_dict['url']
-            content = js_dict['Content']
-            if filter_tags and filter_tags(cat_tags, url, content):
+            content = js_dict['Content'][0]
+            if filter_tags and filter_tags(cat_tags):
                 with open(os.path.join(site_dir, '%d.txt' %i, ), 'w') as f:
-                    f.write(js_dict['Content'][0].encode("utf-8"))
+                    f.write(filter_source_cheating(content).encode("utf-8"))
         i += len(js)
 
 seperator = re.compile(u'([ /,-]|.html)*')
 political_set = {'politics', 'election', 'politicsnews', 'world', 'worldnews',
                  'domesticnews', 'u.s.', 'us', 'news', 'world', 'national', 'nation'}
 #Tags may be a list of tags or one item in a list which must be regexed into a tag list
-def filter_tags(tag_list, url, content):
+def filter_tags(tag_list):
     for t in tag_list:
         words = re.split(seperator, t.lower())
         for w in words:
             if w in political_set:
-                filter_source_cheating(content)
                 return True
     return False
 
-#A more generic solution, but would only work if the name matches the domain
-#use "pip install tld"
-name_getter = re.compile(r"^(.*?)\..*")
-def filter_out_source(url, content):
-    source_name = re.search(name_getter, get_tld(url))
-    for article in content:
-        words = re.split(seperator, article)
-        for i, w in enumerate(words):
-            if w == source_name:
-                print words[i]
-                words[i] = "our reports"
-                print words[i]
-
 #Cheated in the sense that I hard-coded a list of possible names
-#only problem is it seems to replace them, but doesn't do it in the actual text file
 source_set = {'HuffPost', 'Post', 'NYT', 'Times',
               'CNN', 'NBC', 'LA Times', 'Boston Globe', 'Globe', 'Cracked',
               'Onion', 'Beaverton', 'Civilian'}
+source_regex = re.compile('(' + '|'.join(source_set) + ')')
 def filter_source_cheating(content):
-    for article in content:
-        words = re.split(seperator, article)
-        for i, w in enumerate(words):
-            if w in source_set:
-                print words[i]
-                words[i] = "our reports"
-                print words[i]
+    return re.sub(source_regex, "NEWSsource", content)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes files and outputs \
