@@ -4,6 +4,7 @@ import json
 import os
 import re
 import random
+#use "pip install tld"
 from tld import get_tld
 
 def write_articles_to_dir(in_file, out_dir, filter_tags=None):
@@ -83,16 +84,24 @@ def filter_tags(tag_list, url, content):
                 return True
     return False
 
+#A more generic solution, but would only work if the name matches the domain
+#use "pip install tld"
 name_getter = re.compile(r"^(.*?)\..*")
 def filter_out_source(url, content):
     source_name = re.search(name_getter, get_tld(url))
-    for w in content:
-        if w == source_name:
-            content.replace(w, "our reports")
+    for article in content:
+        words = re.split(seperator, article)
+        for i, w in enumerate(words):
+            if w == source_name:
+                print words[i]
+                words[i] = "our reports"
+                print words[i]
 
-source_set = {'HuffPost', 'Huffington Post', 'New York Times', 'The Times',
-              'CNN', 'NBC', 'LA Times', 'Boston Globe', 'The Globe', 'Cracked',
-              'Lush for Life', 'The Onion', 'Beaverton', 'The Civilian'}
+#Cheated in the sense that I hard-coded a list of possible names
+#only problem is it seems to replace them, but doesn't do it in the actual text file
+source_set = {'HuffPost', 'Post', 'NYT', 'Times',
+              'CNN', 'NBC', 'LA Times', 'Boston Globe', 'Globe', 'Cracked',
+              'Onion', 'Beaverton', 'Civilian'}
 def filter_source_cheating(content):
     for article in content:
         words = re.split(seperator, article)
